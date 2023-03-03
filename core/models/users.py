@@ -1,6 +1,6 @@
-from sqlalchemy import Column, INT, TIMESTAMP, String, UniqueConstraint
+from sqlalchemy import Column, INT, TIMESTAMP, String
 
-from sql_app.databases import Base
+from core.databases import Base
 
 
 class Users(Base):
