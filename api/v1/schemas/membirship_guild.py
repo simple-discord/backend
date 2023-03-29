@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 
 from pydantic import BaseModel
 from sqlalchemy import Row
@@ -11,7 +11,7 @@ class GuildMembershipResponse(BaseModel):
     avatar: str
 
     @staticmethod
-    def deserialize_from_sql_response(sql_response: List[Tuple]):
+    def deserialize_from_sql_response(sql_response: Iterable):
         membership = defaultdict(list)
         result = []
         duplicates = set()

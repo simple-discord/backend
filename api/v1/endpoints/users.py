@@ -10,16 +10,7 @@ from core.databases import DiscordDatabaseManager
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Users])
-async def get_users():
-    return {"message": "Hello World"}
-
-@router.get("/{id}", response_model=Users)
-async def get_users_id(id: int):
-    return {"message": "Hello World"}
-
-
-@router.get("/guild_list/{user_id}", response_model=List[UserGuildListResponse])
+@router.get("/guild_list/{user_id}", response_model=List[UserGuildListResponse], tags=["users"])
 def get_user_guild_list(user_id: int, session: Session = Depends(DiscordDatabaseManager.get_db_session)):
     result = session.execute(
         text("SELECT guild.id, guild.name, guild.image FROM membership_guild "
