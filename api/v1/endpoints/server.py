@@ -1,3 +1,5 @@
+import json
+from json import JSONDecodeError
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -49,17 +51,29 @@ def get_guild_membership(guild_id: int, session: Session = Depends(DiscordDataba
     return response
 
 
-@router.post('/', response_model=GuildPostResponse, tags=["guild"])
-def post_guild(parameters: GuildPostResponse, session: Session = Depends(DiscordDatabaseManager.get_db_session)):
-    cursor = session.execute(
-       text("INSERT INTO guild (owner, creator, creation_date, name, image) "
-        "VALUES (:owner, :creator, now(), :name, :image) RETURNING id, owner, creator, creation_date, name, image;"),
-        {'owner': parameters.owner, 'creator': parameters.creator, 'name': parameters.name, 'image': parameters.image}
-    )
-    session.commit()
-    data = cursor.fetchall()
-    # print(type(data[0]), data[0])
-    return GuildPostResponse.deserialize_from_sql(data[0])
+# @router.post('/', response_model=GuildPostResponse, tags=["guild"])
+# def post_guild(parameters: GuildPostResponse, session: Session = Depends(DiscordDatabaseManager.get_db_session)):
+#     cursor = session.execute(
+#        text("INSERT INTO guild (owner, creator, creation_date, name, image) "
+#         "VALUES (:owner, :creator, now(), :name, :image) RETURNING id, owner, creator, creation_date, name, image;"),
+#         {'owner': parameters.owner, 'creator': parameters.creator, 'name': parameters.name, 'image': parameters.image}
+#     )
+#     session.commit()
+#     data = cursor.fetchall()
+#     # print(type(data[0]), data[0])
+#     return GuildPostResponse.deserialize_from_sql(data[0])
+
+
+@router.post('/', tags=["guild"], status_code=201)
+async def create_guild(request: Request):
+    body = await request.body()
+    # TODO guild = GuildSerializer.try_serialize(body)
+    print(body)
+    try:
+        serialized_body = json.loads(body)    # переводим в дикт (сериализатор)
+        return serialized_body["name"]
+    except JSONDecodeError:
+        raise HTTPException(status_code=400, detail="invalid json")
 
 
 @router.delete('/{id}', tags=["guild"])
